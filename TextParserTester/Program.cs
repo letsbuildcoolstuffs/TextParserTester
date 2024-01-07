@@ -1,8 +1,8 @@
-﻿var folder = @"C:\Image Reader\Main";
+﻿string folder = @"C:\Image Reader\Main";
 
 //Filename
-var fileName = "KeyWords.txt";
-var fullPath = folder + fileName;
+string fileName = "KeyWords.txt";
+string fullPath = folder + fileName;
 string? readText = null;
 
 try
@@ -28,5 +28,5 @@ if (string.IsNullOrEmpty(readText))
 /*
 Notes:
 Pseudo code logic:
-Idea will be to read in screenshots, parse, and prep a sales list to skip alt tab process.
+Idea will be to read in screenshots, parse, and prep a sales list to skip alt tab process
 */
