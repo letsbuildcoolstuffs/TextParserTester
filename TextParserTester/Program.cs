@@ -1,24 +1,67 @@
-﻿var folder = @"C:\Image Reader\Main\";
+﻿using System;
+using System.IO;
 
-//Filename
-var fileName = "KeyWords.txt";
-var fullPath = folder + fileName;
-string? readText = null;
+//Folder
+var folder = @"C:\Image Reader\Main\";
 
-try
+//File names
+var fileKeyWords = "KeyWords.txt";
+var fileKeyWordsLog = "KeyWordsHistory.txt";
+
+//File paths
+var pathToFileKeyWords = folder + fileKeyWords;
+var pathToFileKeyWordsLog = folder + fileKeyWordsLog;
+
+string readText = null;
+bool errorForFileKeyWords = false;
+bool errorForFileKeyWordsHistory = false;
+
+if (FileExists(pathToFileKeyWords, out errorForFileKeyWords) && errorForFileKeyWords == false)
 {
-    if (File.Exists(fullPath))
+    readText = File.ReadAllText(pathToFileKeyWords).Trim();
+    if (string.IsNullOrEmpty(readText))
     {
-        //Open the file to read from.
-        readText = File.ReadAllText(fullPath);
+        return;
     }
 }
-catch (Exception)
+else
 {
-    //File could not be opened.
-    readText = null;
+    return;
 }
 
+//Create the history file if it does not exist.
+if (FileExists(pathToFileKeyWordsLog, out errorForFileKeyWordsHistory) == false && errorForFileKeyWordsHistory == false)
+{
+    try
+    {
+        File.Create(pathToFileKeyWordsLog).Dispose();
+        using (var tw = new StreamWriter(pathToFileKeyWordsLog))
+        {
+            tw.WriteLine("Log file created at: " + DateTime.Now);
+        }
+    }
+    catch (Exception)
+    {
+        return;
+    }
+}
+
+if (errorForFileKeyWordsHistory == false)
+{
+    try
+    {
+        using (var sw = new StreamWriter(pathToFileKeyWordsLog, true))
+        {
+            sw.WriteLine("");
+            sw.WriteLine("New entry added at: " + DateTime.Now);
+            sw.WriteLine(readText);
+        }
+    }
+    catch (Exception)
+    {
+        return;
+    }
+}
 
 if (string.IsNullOrEmpty(readText) == false)
 {
@@ -26,6 +69,27 @@ if (string.IsNullOrEmpty(readText) == false)
     Console.ReadKey();
 }
 
+//File.Delete(fullPathIncomingFile);
+
+
+static bool FileExists(string fullPath, out bool error)
+{
+    error = false;
+    try
+    {
+        if (File.Exists(fullPath))
+        {
+            return true;
+        }
+    }
+    catch (Exception)
+    {
+        error = true;
+        return false;
+    }
+
+    return false;
+}
 
 /*
 Notes:
