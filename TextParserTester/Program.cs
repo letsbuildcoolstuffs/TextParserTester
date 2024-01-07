@@ -1,18 +1,33 @@
 ﻿//Folder
-
 var folder = @"C:\Image Reader\Main\";
 
 //File names
 var fileKeyWords = "KeyWords.txt";
 var fileKeyWordsLog = "KeyWordsHistory.txt";
+var fileLastRunErrorLog = "ErrorLogBit.txt";
 
 //File paths
 var pathToFileKeyWords = folder + fileKeyWords;
 var pathToFileKeyWordsLog = folder + fileKeyWordsLog;
+var pathToFileLastRunErrorLog = folder + fileLastRunErrorLog;
 
 string readText = null;
 var errorForFileKeyWords = false;
 var errorForFileKeyWordsHistory = false;
+var errorGettingFilePreviousRun = false;
+
+//If there was an error during the previous iteration then do not continue, create an error file with a 1 bit for true.
+//Dev must fix error state cause, and delete ErrorLogBit to protect loop error continued.
+if (FileExists(pathToFileLastRunErrorLog, out errorGettingFilePreviousRun) && errorGettingFilePreviousRun == false)
+{
+    return;
+}
+
+if (errorGettingFilePreviousRun)
+{
+    //Assume error since error file bit should always be used to prevent a continued loop during error state true.
+    return;
+}
 
 if (FileExists(pathToFileKeyWords, out errorForFileKeyWords) && errorForFileKeyWords == false)
 {
@@ -24,36 +39,65 @@ if (FileExists(pathToFileKeyWords, out errorForFileKeyWords) && errorForFileKeyW
 }
 else
 {
+    if (errorForFileKeyWords)
+    {
+        CreateFileErrorStateBit(pathToFileLastRunErrorLog);
+        return;
+    }
+
+    //No file to read in for keywords so end here.
     return;
 }
 
 //Create the history file if it does not exist.
 var strFirstLine = "Log file created at: " + DateTime.Now;
 CreateFileIfNotExists(pathToFileKeyWordsLog, strFirstLine, out errorForFileKeyWordsHistory);
-
-if (errorForFileKeyWordsHistory == false)
+if (errorForFileKeyWordsHistory)
 {
-    WriteToFileIfExists(pathToFileKeyWordsLog, "", out errorForFileKeyWords);
-    if (errorForFileKeyWords == false)
+    CreateFileErrorStateBit(pathToFileLastRunErrorLog);
+    return;
+}
+else
+{
+    WriteToFileIfExists(pathToFileKeyWordsLog, "", out errorForFileKeyWordsHistory);
+    if (errorForFileKeyWordsHistory == false)
     {
         var strLogDateTime = "New entry added at: " + DateTime.Now;
-        WriteToFileIfExists(pathToFileKeyWordsLog, strLogDateTime, out errorForFileKeyWords);
+        WriteToFileIfExists(pathToFileKeyWordsLog, strLogDateTime, out errorForFileKeyWordsHistory);
     }
 
-    if (errorForFileKeyWords == false)
+    if (errorForFileKeyWordsHistory == false)
     {
-        WriteToFileIfExists(pathToFileKeyWordsLog, readText, out errorForFileKeyWords);
+        WriteToFileIfExists(pathToFileKeyWordsLog, readText, out errorForFileKeyWordsHistory);
+    }
+
+    if (errorForFileKeyWordsHistory)
+    {
+        CreateFileErrorStateBit(pathToFileLastRunErrorLog);
+        return;
     }
 }
 
 if (string.IsNullOrEmpty(readText) == false)
 {
     Console.Write(readText);
-    Console.ReadKey();
+    //Console.ReadKey();
 }
 
 //File.Delete(fullPathIncomingFile);
 
+
+static bool CreateFileErrorStateBit(string pathToFileLastRunErrorLog)
+{
+    bool errorWritingErrorBit = false;
+    bool success = CreateFileIfNotExists(pathToFileLastRunErrorLog, "Error State: 1, at: " + DateTime.Now, out errorWritingErrorBit);
+    if (errorWritingErrorBit)
+    {
+        return false;
+    }
+
+    return success;
+}
 
 static bool FileExists(string fullPath, out bool error)
 {
