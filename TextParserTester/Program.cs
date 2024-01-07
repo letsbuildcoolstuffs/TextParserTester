@@ -1,4 +1,5 @@
 ﻿//Folder
+
 var folder = @"C:\Image Reader\Main\";
 
 //File names
@@ -10,8 +11,8 @@ var pathToFileKeyWords = folder + fileKeyWords;
 var pathToFileKeyWordsLog = folder + fileKeyWordsLog;
 
 string readText = null;
-bool errorForFileKeyWords = false;
-bool errorForFileKeyWordsHistory = false;
+var errorForFileKeyWords = false;
+var errorForFileKeyWordsHistory = false;
 
 if (FileExists(pathToFileKeyWords, out errorForFileKeyWords) && errorForFileKeyWords == false)
 {
