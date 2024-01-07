@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-//Folder
+﻿//Folder
 var folder = @"C:\Image Reader\Main\";
 
 //File names
@@ -35,10 +32,8 @@ if (FileExists(pathToFileKeyWordsLog, out errorForFileKeyWordsHistory) == false 
     try
     {
         File.Create(pathToFileKeyWordsLog).Dispose();
-        using (var tw = new StreamWriter(pathToFileKeyWordsLog))
-        {
-            tw.WriteLine("Log file created at: " + DateTime.Now);
-        }
+        using var tw = new StreamWriter(pathToFileKeyWordsLog);
+        tw.WriteLine("Log file created at: " + DateTime.Now);
     }
     catch (Exception)
     {
@@ -50,12 +45,10 @@ if (errorForFileKeyWordsHistory == false)
 {
     try
     {
-        using (var sw = new StreamWriter(pathToFileKeyWordsLog, true))
-        {
-            sw.WriteLine("");
-            sw.WriteLine("New entry added at: " + DateTime.Now);
-            sw.WriteLine(readText);
-        }
+        using var sw = new StreamWriter(pathToFileKeyWordsLog, true);
+        sw.WriteLine("");
+        sw.WriteLine("New entry added at: " + DateTime.Now);
+        sw.WriteLine(readText);
     }
     catch (Exception)
     {
