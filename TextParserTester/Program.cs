@@ -1,4 +1,4 @@
-﻿var folder = @"C:\Image Reader\Main";
+﻿var folder = @"C:\Image Reader\Main\";
 
 //Filename
 var fileName = "KeyWords.txt";
@@ -20,8 +20,10 @@ catch (Exception)
 }
 
 
-if (string.IsNullOrEmpty(readText))
+if (string.IsNullOrEmpty(readText) == false)
 {
+    Console.Write(readText);
+    Console.ReadKey();
 }
 
 
