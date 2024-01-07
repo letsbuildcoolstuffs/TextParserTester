@@ -28,32 +28,21 @@ else
 }
 
 //Create the history file if it does not exist.
-if (FileExists(pathToFileKeyWordsLog, out errorForFileKeyWordsHistory) == false && errorForFileKeyWordsHistory == false)
-{
-    try
-    {
-        File.Create(pathToFileKeyWordsLog).Dispose();
-        using var tw = new StreamWriter(pathToFileKeyWordsLog);
-        tw.WriteLine("Log file created at: " + DateTime.Now);
-    }
-    catch (Exception)
-    {
-        return;
-    }
-}
+var strFirstLine = "Log file created at: " + DateTime.Now;
+CreateFileIfNotExists(pathToFileKeyWordsLog, strFirstLine, out errorForFileKeyWordsHistory);
 
 if (errorForFileKeyWordsHistory == false)
 {
-    try
+    WriteToFileIfExists(pathToFileKeyWordsLog, "", out errorForFileKeyWords);
+    if (errorForFileKeyWords == false)
     {
-        using var sw = new StreamWriter(pathToFileKeyWordsLog, true);
-        sw.WriteLine("");
-        sw.WriteLine("New entry added at: " + DateTime.Now);
-        sw.WriteLine(readText);
+        var strLogDateTime = "New entry added at: " + DateTime.Now;
+        WriteToFileIfExists(pathToFileKeyWordsLog, strLogDateTime, out errorForFileKeyWords);
     }
-    catch (Exception)
+
+    if (errorForFileKeyWords == false)
     {
-        return;
+        WriteToFileIfExists(pathToFileKeyWordsLog, readText, out errorForFileKeyWords);
     }
 }
 
@@ -83,6 +72,48 @@ static bool FileExists(string fullPath, out bool error)
     }
 
     return false;
+}
+
+static bool CreateFileIfNotExists(string pathFull, string text, out bool error)
+{
+    error = false;
+
+    if (FileExists(pathFull, out error) == false && error == false)
+    {
+        try
+        {
+            File.Create(pathFull).Dispose();
+            using var sw = new StreamWriter(pathFull);
+            sw.WriteLine(text);
+        }
+        catch (Exception)
+        {
+            error = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+static bool WriteToFileIfExists(string pathFull, string text, out bool error)
+{
+    error = false;
+
+    try
+    {
+        using var sw = new StreamWriter(pathFull, true);
+        sw.WriteLine(text);
+    }
+    catch (Exception)
+    {
+        error = true;
+        return false;
+    }
+
+    return true;
 }
 
 /*
