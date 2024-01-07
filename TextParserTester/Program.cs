@@ -1,4 +1,5 @@
 ﻿//Folder
+
 var folder = @"C:\Image Reader\Main\";
 
 //File names
@@ -57,25 +58,23 @@ if (errorForFileKeyWordsHistory)
     CreateFileErrorStateBit(pathToFileLastRunErrorLog);
     return;
 }
-else
+
+WriteToFileIfExists(pathToFileKeyWordsLog, "", out errorForFileKeyWordsHistory);
+if (errorForFileKeyWordsHistory == false)
 {
-    WriteToFileIfExists(pathToFileKeyWordsLog, "", out errorForFileKeyWordsHistory);
-    if (errorForFileKeyWordsHistory == false)
-    {
-        var strLogDateTime = "New entry added at: " + DateTime.Now;
-        WriteToFileIfExists(pathToFileKeyWordsLog, strLogDateTime, out errorForFileKeyWordsHistory);
-    }
+    var strLogDateTime = "New entry added at: " + DateTime.Now;
+    WriteToFileIfExists(pathToFileKeyWordsLog, strLogDateTime, out errorForFileKeyWordsHistory);
+}
 
-    if (errorForFileKeyWordsHistory == false)
-    {
-        WriteToFileIfExists(pathToFileKeyWordsLog, readText, out errorForFileKeyWordsHistory);
-    }
+if (errorForFileKeyWordsHistory == false)
+{
+    WriteToFileIfExists(pathToFileKeyWordsLog, readText, out errorForFileKeyWordsHistory);
+}
 
-    if (errorForFileKeyWordsHistory)
-    {
-        CreateFileErrorStateBit(pathToFileLastRunErrorLog);
-        return;
-    }
+if (errorForFileKeyWordsHistory)
+{
+    CreateFileErrorStateBit(pathToFileLastRunErrorLog);
+    return;
 }
 
 if (string.IsNullOrEmpty(readText) == false)
@@ -89,8 +88,9 @@ if (string.IsNullOrEmpty(readText) == false)
 
 static bool CreateFileErrorStateBit(string pathToFileLastRunErrorLog)
 {
-    bool errorWritingErrorBit = false;
-    bool success = CreateFileIfNotExists(pathToFileLastRunErrorLog, "Error State: 1, at: " + DateTime.Now, out errorWritingErrorBit);
+    var errorWritingErrorBit = false;
+    var success = CreateFileIfNotExists(pathToFileLastRunErrorLog, "Error State: 1, at: " + DateTime.Now,
+        out errorWritingErrorBit);
     if (errorWritingErrorBit)
     {
         return false;
