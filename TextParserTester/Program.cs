@@ -1,8 +1,8 @@
-﻿string folder = @"C:\Image Reader\Main";
+﻿var folder = @"C:\Image Reader\Main";
 
 //Filename
-string fileName = "KeyWords.txt";
-string fullPath = folder + fileName;
+var fileName = "KeyWords.txt";
+var fullPath = folder + fileName;
 string? readText = null;
 
 try
